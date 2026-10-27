@@ -1,9 +1,6 @@
 package colony;
 
-/**
- * Outcome of an operation (mission submission, emergency handling, ...)
- * together with a human-readable message / failure reason.
- */
+
 public final class OperationResult {
 
     private final boolean success;
@@ -30,7 +27,7 @@ public final class OperationResult {
         return message;
     }
 
-    @Override
+    
     public String toString() {
         return (success ? "SUCCESS: " : "FAILURE: ") + message;
     }
