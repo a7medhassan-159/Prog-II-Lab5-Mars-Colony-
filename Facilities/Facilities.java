@@ -38,9 +38,9 @@ public abstract class Facilities {
     public Map<ResourceType, Integer> getStock() {
         return stock;
     }
-    public void addresource(ResourceType type, int quantity) {
-        stock.put(type, stock.getOrDefault(type, 0) + quantity);
-    }
+    
+
+    
        
 
 
