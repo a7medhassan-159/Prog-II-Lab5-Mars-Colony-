@@ -1,0 +1,11 @@
+package agents;
+
+public enum Capability {
+    SCIENTIFIC_RESEARCH,
+    ENGINEERING_REPAIR,
+    ROBOTIC_REPAIR,
+    MEDICAL_CARE,
+    FIRE_RESPONSE,
+    SURFACE_TRAVEL,
+    AERIAL_RECON
+}
