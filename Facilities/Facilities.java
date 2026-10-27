@@ -38,6 +38,17 @@ public abstract class Facilities {
     public Map<ResourceType, Integer> getStock() {
         return stock;
     }
+    public void addresource(ResourceType type, int quantity,String unit) {
+        if (type == null || quantity < 0)
+        {System.out.println("Invalid resource type or quantity. Cannot add to stock.");
+            return;
+
+        }
+         
+        }
+
+
+    }
     
 
     
@@ -48,4 +59,4 @@ public abstract class Facilities {
 
 
 
-}
+
