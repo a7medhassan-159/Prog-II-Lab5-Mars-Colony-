@@ -9,6 +9,6 @@ public class MedicalOfficer extends CrewMember {
     
     public MedicalOfficer(String id, String name, Location location, String... skills) {
         super(id, name, location, Arrays.asList(skills),
-                Capability.MEDICAL_CARE, Capability.FIRE_RESPONSE,);
+                Capability.MEDICAL_CARE, Capability.FIRE_RESPONSE);
     }
 }
