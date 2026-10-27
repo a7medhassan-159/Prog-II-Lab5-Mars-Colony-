@@ -1,4 +1,4 @@
-package marsops.facilities;
+package Facilities ;
 
 public enum EquipmentType {
     SCIENTIFIC,

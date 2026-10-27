@@ -1,3 +1,4 @@
+package resources;
 public class ResourceRequest {
     private final ResourceType type;
     private final int quantity;
