@@ -16,6 +16,8 @@ public abstract class Facilities implements Location {
     private boolean isSheltered;
     private final List<Equipment> equipment = new ArrayList<>();
     public Facilities(String name, Location location, int capacity, boolean isOperational,ResourceType... resourceTypes) {
+    //private equipemnt
+    public Facilities(String name, Location location, int capacity, boolean isOperational) {
         this.name = name;
         this.location = location;
         this.capacity = capacity;
@@ -88,14 +90,15 @@ public abstract class Facilities implements Location {
 
 
     }
-    
 
+    public boolean isSheltered(){
+        return isSheltered;
+    }
+    public Map<ResourceType, Integer> getStock() {
+        return stock;
+    }
+    
+}
     
        
-
-
-
-
-
-
 
