@@ -7,11 +7,11 @@ import agents.*;
 public class Resources {
     private final ResourceType type;
     private int quantity;
-    private final String unit;
-    public Resources(ResourceType type, int quantity, String unit) {
+   
+    public Resources(ResourceType type, int quantity) {
         this.type = type;
         this.quantity = quantity;
-        this.unit = unit;
+        
     }
     public ResourceType getType() {
         return type;
@@ -19,11 +19,9 @@ public class Resources {
     public int getQuantity() {
         return quantity;
     }
-    public String getUnit() {
-        return unit;
-    }
-    public void setQuantity(int amount) {
-        this.quantity = amount;
+    
+    public void addQuantity(int amount) {
+        this.quantity += amount;
     }
     public boolean consume(int amount) {
         if (amount <= quantity) {

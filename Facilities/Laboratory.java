@@ -1,5 +1,6 @@
 package Facilities;
 
-public class Laboratory {
+public class Laboratory extends Facilities {
+    
 
 }
