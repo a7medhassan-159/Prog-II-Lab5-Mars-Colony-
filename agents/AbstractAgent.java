@@ -1,6 +1,5 @@
 package agents;
 import  colony.*;
-import environment.Environment;
 import missions.Mission;
 
 import java.util.*;
@@ -80,25 +79,9 @@ public abstract class AbstractAgent {
         return matches ;
     }
 
-    // ابقى بص  
-    public String getEnvironmentRestriction(Environment environment) {
-        return null;
-    }
 
-    
-    public void applyHazard(int severity) {
-        // default: unaffected
-    }
 
-    
-    public boolean needsMedicalAttention() {
-        return false;
-    }
 
-    
-    public void receiveTreatment(int amount) {
-        // default: nothing to treat
-    }
 }
    
 

@@ -3,7 +3,6 @@ package agents;
 import colony.*;
 import environment.*;
 
-/** Aerial reconnaissance; remotely controlled, so it needs communication. */
 public class Drone extends Robot {
 
     public Drone(String id, String name, Location location, int battery) {
