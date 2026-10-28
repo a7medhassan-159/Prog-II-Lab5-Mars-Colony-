@@ -43,15 +43,8 @@ public abstract class Facilities implements Location {
     public Map<ResourceType, Integer> getStock() {
         return stock;
     }
-
     
-
+}
     
        
 
-
-
-
-
-
-}
