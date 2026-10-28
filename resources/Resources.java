@@ -1,9 +1,5 @@
 package resources;
 
-import  colony.*;
-import java.util.*;
-import agents.*;
-
 public class Resources {
     private final ResourceType type;
     private int quantity;
@@ -31,9 +27,9 @@ public class Resources {
             return false;
         }
     }
-    @Override
-    public String toString() {
-        return "Resources [type=" + type + ", quantity=" + quantity + ", unit=" + unit + "]";
-    }
+    // @Override
+    // public String toString() {
+    //     return "Resources [type=" + type + ", quantity=" + quantity + ", unit=" + unit + "]";
+    // }
     
 }
