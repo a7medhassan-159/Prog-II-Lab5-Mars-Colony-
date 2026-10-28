@@ -1,11 +1,16 @@
 package agents;
 
-import java.util.*;
 import  colony.*;
 public class Scientist extends CrewMember {
 
-    public Scientist(String id, String name, Location location, String... skills) {
-        super(id, name, location, Arrays.asList(skills), Capability.SCIENTIFIC_RESEARCH);
+    public Scientist(String id, String name, Location location) {
+        super(id, name, location, Capability.SCIENTIFIC_RESEARCH);
     }
+
+    @Override 
+
+    public void performDuty() { 
+        System.out.println("Conducting research."); 
+    } 
 
 }
