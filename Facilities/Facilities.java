@@ -5,7 +5,7 @@ import java.util.*;
 import agents.*;
 import resources.*;
 
-public abstract class Facilities {
+public abstract class Facilities implements Location {
 
     private final String name;
     private final Location location;
@@ -13,6 +13,7 @@ public abstract class Facilities {
     private int capacity;
     private final Map<ResourceType, Integer> stock = new EnumMap<>(ResourceType.class);
     private boolean isOperational;
+    private boolean isSheltered;
     //private equipemnt
     public Facilities(String name, Location location, int capacity, boolean isOperational) {
         this.name = name;
@@ -35,9 +36,14 @@ public abstract class Facilities {
     public boolean isOperational() {
         return isOperational;
     }
+
+    public boolean isSheltered(){
+        return isSheltered;
+    }
     public Map<ResourceType, Integer> getStock() {
         return stock;
     }
+
     
 
     
