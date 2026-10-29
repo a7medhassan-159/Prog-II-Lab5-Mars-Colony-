@@ -22,6 +22,7 @@ public abstract class Robot extends AbstractAgent implements Repairable {
     }
 
     public abstract int getBatteryDrainPerUnit();
+    public abstract int getBatteryrechargePerUnit();
 
     public int getBatteryLevel() {
         return battery;

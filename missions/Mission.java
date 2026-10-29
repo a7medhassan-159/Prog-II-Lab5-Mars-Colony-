@@ -4,7 +4,7 @@ import agents.*;
 import environment.*;
 import Facilities.*;
 import resources.*;
-
+import colony.*;
 import java.util.*;
 
 
@@ -17,7 +17,8 @@ public abstract class Mission {
     private MissionStatus status = MissionStatus.CREATED;
     private String failureReason; 
     private final List<AbstractAgent> assignedAgents = new ArrayList<>();
-
+    private final Map<AbstractAgent, Location> origins = new HashMap<>();
+    private boolean released;
 
 
     protected Mission(String id, String name, int duration) {
@@ -56,8 +57,7 @@ public abstract class Mission {
     public List<AbstractAgent> getAssignedAgents() {
         return Collections.unmodifiableList(assignedAgents);
     }
-
-    @Override
+    
     public String toString() {
         return "[" + id + "] " + name + " (" + status
                 + (status == MissionStatus.IN_PROGRESS ? " " + timepassed + "/" + duration : "")
@@ -89,8 +89,8 @@ public abstract class Mission {
 
 
 
-    protected void onReleased() {
-    }
+    protected void onReleased(){}; 
+    
 
     //validation 
 
@@ -123,6 +123,133 @@ public abstract class Mission {
         
         return teamCapabilities.containsAll(getRequiredCapabilities());
     }
+
+
+    
+    //ADDED
+
+
+    
+
+    public String checkPreconditions(MarsColony colony) { 
+        return null;
+    }
+
+    
+    protected String checkOngoingExtras(MarsColony colony) {
+        return null;
+    }
+
+    protected void onAssigned(MarsColony colony) {
+    }
+
+    protected void onStarted(MarsColony colony) {
+    }
+
+    protected void onCompleted(MarsColony colony) {
+    }
+
+    public final String checkConditions(MarsColony colony, List<AbstractAgent> agents) {
+        if (requiresCommunication() && !colony.isCommunicationAvailable()) {
+            return "Communication capability is unavailable";
+        }
+
+        String teamError = validateTeam(agents);
+        if (teamError != null) {
+            return teamError;
+        }
+
+        String preError = checkPreconditions(colony);
+        if (preError != null) {
+            return preError;
+        }
+
+        return null; 
+    }
+
+    public final String checkOngoing(MarsColony colony) {
+        String reason = checkConditions(colony, assignedAgents);
+        if (reason != null) {
+            return reason;
+        }
+        for (Facilities f : getRequiredFacilities()) {
+            if (!f.isOperational()) {
+                return "Required facility " + f.getName() + " is no longer available";
+            }
+        }
+        for (AbstractAgent a : assignedAgents) {
+            String problem = a.getOperationalProblem();
+            if (problem != null) {
+                return "Agent " + a.getName() + " is no longer operational: " + problem;
+            }
+        }
+        return checkOngoingExtras(colony);
+    }
+
+    //states
+
+    private void requireStatus(MissionStatus expected, String action) {
+        if (status != expected) {
+            System.out.println("Cannot " + action + " mission " + id + " in state " + status + " (expected " + expected + ")");
+        }
+    }
+
+    public final void assign(List<AbstractAgent> agents, MarsColony colony) {
+        requireStatus(MissionStatus.CREATED, "assign");
+        for (AbstractAgent a : agents) {
+            assignedAgents.add(a);
+            origins.put(a, a.getLocation());
+            a.setBusy(true);
+        }
+        status = MissionStatus.ASSIGNED;
+        onAssigned(colony);
+    }
+
+    
+    public final void start(MarsColony colony) {
+        requireStatus(MissionStatus.ASSIGNED, "start");
+        status = MissionStatus.IN_PROGRESS;
+        if (isSurfaceMission()) {
+            for (AbstractAgent a : assignedAgents) {
+                a.setLocation(SurfaceLocation.MARS_SURFACE);
+            }
+        }
+        onStarted(colony);
+    }
+
+
+    public final void advance(MarsColony colony) {
+        requireStatus(MissionStatus.IN_PROGRESS, "advance");
+        timepassed++;
+        if (timepassed >= duration) {
+            status = MissionStatus.COMPLETED;
+            onCompleted(colony);
+        }
+    }
+
+    public final void fail(String reason) {
+        if (status.isFinal()) {
+            System.out.println("Mission " + id + " already finished (" + status + ")");
+        }
+        status = MissionStatus.FAILED;
+        failureReason = reason;
+    }
+
+    public final void release() {
+        if (released) {
+            return;
+        }
+        released = true;
+        for (AbstractAgent a : assignedAgents) {
+            a.setBusy(false);
+            Location origin = origins.get(a);
+            if (a.isOperational() && origin != null) {
+                a.setLocation(origin);
+            }
+        }
+        onReleased();
+    }
+
 
 
 

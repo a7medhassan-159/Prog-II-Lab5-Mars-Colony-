@@ -70,11 +70,18 @@ public abstract class CrewMember extends AbstractAgent {
  
     public void advanceTime() {
         if (isBusy()) {
-            fatigue = Math.min(MAX_FATIGUE, fatigue + FATIGUE_GAIN_BUSY);
+            fatigue += FATIGUE_GAIN_BUSY;
+            if (fatigue > MAX_FATIGUE) {
+                fatigue = MAX_FATIGUE;
+            }
         } else {
-            fatigue = Math.max(0, fatigue - FATIGUE_RECOVERY);
+            fatigue -= FATIGUE_RECOVERY;
+            if (fatigue < 0) {
+                fatigue = 0;
+            }
         }
     }
+
     
     public String toString() {
         String status;
@@ -85,5 +92,6 @@ public abstract class CrewMember extends AbstractAgent {
         return getName() + " [ID: " + getId() + "] | Health: " + health + " | Fatigue: " + fatigue + 
             " | Capabilities: " + getCapabilities() + " | Location: " + getLocation().getName() + " | Status: " + status;
     }
+
 
 }

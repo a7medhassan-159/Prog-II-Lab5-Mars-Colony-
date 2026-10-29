@@ -1,6 +1,6 @@
 package environment;
 
-/** Environmental conditions that can affect colony operations. */
+
 public enum EnvironmentCondition {
     NORMAL("Normal conditions"),
     DUST_STORM("Dust storm"),

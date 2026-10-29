@@ -38,17 +38,17 @@ public class Environment {
         return active.isEmpty();
     }
 
-    public String describe() {
+    public String toString() {
         if (active.isEmpty()) {
             return EnvironmentCondition.NORMAL.getLabel();
         }
-        StringBuilder sb = new StringBuilder();
+        String result = "";
         for (EnvironmentCondition c : active) {
-            if (sb.length() > 0) {
-                sb.append(", ");
+            if (!result.isEmpty()) {
+                result += ", ";
             }
-            sb.append(c.getLabel());
+            result += c.getLabel();
         }
-        return sb.toString();
+        return result;
     }
 }

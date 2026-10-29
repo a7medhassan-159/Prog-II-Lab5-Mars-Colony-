@@ -9,4 +9,12 @@ public class communicationstation extends Facilities {
         super(name, location, capacity, isOperational,ResourceType.SPARE_PARTS);
     }
 
+    public String getFacilityType() {
+        return "Communication Station";
+    }
+    
+    
+    public boolean providesCommunication() {
+        return true;
+    }
 }

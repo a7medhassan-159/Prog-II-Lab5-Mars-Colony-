@@ -45,7 +45,7 @@ public abstract class AbstractAgent {
     
 
     
-    public Set<Capability> getCapabilities() {return Collections.unmodifiableSet(capabilities);}
+    public Set<Capability> getCapabilities() {return capabilities;}
 
     public String getOperationalProblem(){
         return null;
@@ -69,15 +69,19 @@ public abstract class AbstractAgent {
         if (!isOperational()) {
             return false;
         }
-        boolean matches = false;
+        boolean capabilitiesMatches = false;
         for (Capability c : mission.getRequiredCapabilities()) {
             if (hasCapability(c)) {
-                matches = true;
+                capabilitiesMatches = true;
                 break;
             }
         }
-        return matches ;
+        return capabilitiesMatches ;
     }
+
+    public abstract void advanceTime();
+
+
 
 
 

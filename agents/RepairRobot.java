@@ -12,4 +12,7 @@ public class RepairRobot extends Robot {
     public int getBatteryDrainPerUnit() {
         return 3;
     }
+    public int getBatteryrechargePerUnit() {
+        return 1;
+    }
 }

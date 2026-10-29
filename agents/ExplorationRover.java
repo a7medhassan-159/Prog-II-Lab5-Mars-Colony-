@@ -14,9 +14,13 @@ public class ExplorationRover extends Robot {
         return 5;
     }
 
+    public int getBatteryrechargePerUnit() {
+        return 2;
+    }
     
     public String getEnvironmentRestriction(Environment environment) {
         return environment.isDustStorm() ? "rovers cannot operate on the surface during a dust storm" : null;
     }
+
     
 }

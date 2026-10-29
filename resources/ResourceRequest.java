@@ -9,6 +9,8 @@ public class ResourceRequest {
         this.type = type;
         this.quantity = quantity;
     }
+
+    
     public ResourceType getType() { return type; }
     public int getQuantity() { return quantity; }
 }

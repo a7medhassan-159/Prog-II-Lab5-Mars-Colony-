@@ -13,7 +13,9 @@ public class Drone extends Robot {
     public int getBatteryDrainPerUnit() {
         return 4;
     }
-
+    public int getBatteryrechargePerUnit() {
+        return 3;
+    }
     
     public String getEnvironmentRestriction(Environment environment) {
         return (environment.isCommunicationDisrupted())? "drones cannot be controlled during a communication disruption" : null;
