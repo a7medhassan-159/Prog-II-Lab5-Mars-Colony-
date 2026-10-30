@@ -1,0 +1,16 @@
+@startuml
+title Sequence Diagram - Mission Rejection (Unsuitable Agent)
+
+actor Main
+participant MarsColony
+participant ResearchMission
+participant Engineer
+
+Main -> MarsColony : submitMission(bad, [engineer])
+MarsColony -> ResearchMission : validateTeam([engineer])
+ResearchMission -> Engineer : canPerform(bad)
+Engineer --> ResearchMission : false
+ResearchMission --> MarsColony : "does not have required capability"
+MarsColony -> ResearchMission : fail(reason)
+MarsColony --> Main : failure(reason)
+@enduml

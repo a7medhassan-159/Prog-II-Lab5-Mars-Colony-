@@ -1,0 +1,28 @@
+@startuml
+title Use Case Diagram - MARS-OPS
+
+left to right direction
+actor Operator
+actor Environment
+
+rectangle "MARS-OPS" {
+  usecase "Set up colony" as Setup
+  usecase "Submit mission" as Submit
+  usecase "Check team capabilities" as Team
+  usecase "Check resources" as Res
+  usecase "Reject mission" as Reject
+  usecase "Advance time" as Time
+  usecase "Change environment condition" as Env
+  usecase "View status report" as Report
+}
+
+Operator --> Setup
+Operator --> Submit
+Operator --> Time
+Operator --> Report
+Environment --> Env
+
+Submit ..> Team : <<include>>
+Submit ..> Res : <<include>>
+Reject ..> Submit : <<extend>>
+@enduml

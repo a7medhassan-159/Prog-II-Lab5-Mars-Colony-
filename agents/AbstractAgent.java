@@ -11,7 +11,7 @@ public abstract class AbstractAgent {
     private final String name;
     private boolean busy;
     private Location location;
-    private final Set<Capability> capabilities = EnumSet.noneOf(Capability.class);
+    private final EnumSet<Capability> capabilities = EnumSet.noneOf(Capability.class);
 
     protected AbstractAgent(String id, String name, Location location, Capability... capabilities) {
         this.id = id;
@@ -25,6 +25,11 @@ public abstract class AbstractAgent {
 
     
     public String getName() {return name;}
+
+
+    public boolean canHandleEmergency(Capability capability) {
+    return isAvailable() && hasCapability(capability);
+}
 
 
     public Location getLocation() {

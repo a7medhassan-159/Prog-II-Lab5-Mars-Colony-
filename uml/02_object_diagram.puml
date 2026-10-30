@@ -1,0 +1,67 @@
+@startuml
+title Object Diagram - Exploration mission assigned
+
+object ares {
+  name = "Ares Base"
+  currentTime = 0
+}
+object env {
+  active = none
+}
+object lab {
+  name = "Central Lab"
+  capacity = 10
+}
+object power {
+  name = "Solar Power Station"
+  BATTERY_POWER = 50
+}
+object storage {
+  name = "Main Storage"
+  FUEL = 10
+}
+object roverKit {
+  id = "EQ-02"
+  type = EXPLORATION
+  inUse = true
+}
+object scientist {
+  id = "C-01"
+  name = "Dr. Sarah"
+  health = 100
+  busy = true
+}
+object engineer {
+  id = "C-02"
+  name = "Eng. Alex"
+  busy = false
+}
+object rover {
+  id = "R-01"
+  name = "Rover Alpha"
+  battery = 100
+  busy = true
+}
+object ex1 {
+  id = "EX-1"
+  region = "Olympus Mons"
+  duration = 5
+  status = ASSIGNED
+}
+
+ares --> env
+ares --> lab
+ares --> power
+ares --> storage
+ares --> scientist
+ares --> engineer
+ares --> rover
+ares --> ex1
+lab --> roverKit
+scientist --> lab : location
+engineer --> lab : location
+rover --> lab : location
+ex1 --> scientist : agent
+ex1 --> rover : agent
+ex1 --> roverKit : equipment
+@enduml

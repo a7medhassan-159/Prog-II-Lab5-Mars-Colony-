@@ -1,0 +1,14 @@
+@startuml
+title State Machine Diagram - Mission
+
+[*] --> CREATED
+CREATED --> ASSIGNED : submitMission() succeeds
+CREATED --> FAILED : submitMission() rejected
+ASSIGNED --> IN_PROGRESS : start()
+ASSIGNED --> FAILED : problem found
+IN_PROGRESS --> IN_PROGRESS : advance() [time left]
+IN_PROGRESS --> COMPLETED : advance() [timepassed >= duration]
+IN_PROGRESS --> FAILED : problem found
+COMPLETED --> [*]
+FAILED --> [*]
+@enduml

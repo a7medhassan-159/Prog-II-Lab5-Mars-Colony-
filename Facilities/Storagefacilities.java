@@ -6,7 +6,7 @@ public class Storagefacilities extends Facilities   {
 
 public Storagefacilities(String name, Location location, int capacity, boolean isOperational,
         ResourceType... resourceTypes) {
-    super(name, location, capacity, isOperational,ResourceType.FUEL);
+    super(name, location, capacity, isOperational,resourceTypes);
 }
 
 

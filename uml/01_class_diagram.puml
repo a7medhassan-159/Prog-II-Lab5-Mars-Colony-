@@ -1,0 +1,221 @@
+@startuml
+title MARS-OPS Class Diagram
+
+package agents {
+  interface Repairable {
+    getName()
+    isDamaged()
+    repair()
+  }
+  enum Capability {
+    SCIENTIFIC_RESEARCH
+    ENGINEERING_REPAIR
+    ROBOTIC_REPAIR
+    MEDICAL_CARE
+    FIRE_RESPONSE
+    SURFACE_TRAVEL
+    AERIAL_RECON
+  }
+  enum HealthStatus {
+    HEALTHY
+    INJURED
+    CRITICAL
+  }
+  enum DamageStatus {
+    OPERATIONAL
+    DAMAGED
+  }
+  abstract class AbstractAgent {
+    - id : String
+    - name : String
+    - busy : boolean
+    + isAvailable() : boolean
+    + canPerform(mission) : boolean
+    + advanceTime()
+  }
+  abstract class CrewMember {
+    - health : int
+    - fatigue : int
+    + performDuty()
+    + heal(amount)
+  }
+  abstract class Robot {
+    - battery : int
+    + drainBattery(amount)
+    + recharge(amount)
+    + repair()
+  }
+  class Scientist
+  class Engineer
+  class MedicalOfficer
+  class ExplorationRover
+  class Drone
+  class RepairRobot
+}
+
+package colony {
+  interface Location {
+    getName()
+    isOperational()
+    isSheltered()
+  }
+  class SurfaceLocation
+  class OperationResult {
+    - success : boolean
+    - message : String
+  }
+  class Reacordingevents {
+    - entries : List
+    + record(time, message)
+  }
+  class MarsColony {
+    - name : String
+    - currentTime : int
+    + addCrewMember(member)
+    + addRobot(robot)
+    + addFacility(facility)
+    + submitMission(mission, agents)
+    + advanceTime(units)
+    + activateCondition(condition)
+  }
+}
+
+package environment {
+  enum EnvironmentCondition {
+    NORMAL
+    DUST_STORM
+    COMMUNICATION_DISRUPTION
+  }
+  class Environment {
+    + activate(condition)
+    + deactivate(condition)
+    + isDustStorm() : boolean
+  }
+}
+
+package "Facilities" as pkgFacilities {
+  enum EquipmentType {
+    SCIENTIFIC
+    EXPLORATION
+    REPAIR_TOOLS
+    MEDICAL
+    COMMUNICATION
+  }
+  abstract class Facilities {
+    - name : String
+    - capacity : int
+    - isOperational : boolean
+    + addresource(type, quantity)
+    + addEquipment(equipment)
+  }
+  class Laboratory
+  class habitat
+  class powerstation
+  class Storagefacilities
+  class communicationstation
+}
+
+package resources {
+  enum ResourceType {
+    OXYGEN
+    WATER
+    FOOD
+    FUEL
+    BATTERY_POWER
+    MEDICAL_SUPPLIES
+    SPARE_PARTS
+  }
+  class Resources {
+    + getQuantity(type)
+    + addQuantity(type, amount)
+    + findShortage(requirement)
+    + consume(requirement)
+  }
+  class Equipment {
+    - id : String
+    - name : String
+    - damaged : boolean
+    - inUse : boolean
+  }
+}
+
+package missions {
+  enum MissionStatus {
+    CREATED
+    ASSIGNED
+    IN_PROGRESS
+    COMPLETED
+    FAILED
+  }
+  abstract class Mission {
+    - id : String
+    - name : String
+    - duration : int
+    - timepassed : int
+    + validateTeam(agents)
+    + assign(agents, colony)
+    + start(colony)
+    + advance(colony)
+    + fail(reason)
+    + release()
+  }
+  class ExplorationMission {
+    - region : String
+  }
+  class ResearchMission
+  class RepairMission
+  class RescueMission
+}
+
+AbstractAgent <|-- CrewMember
+AbstractAgent <|-- Robot
+CrewMember <|-- Scientist
+CrewMember <|-- Engineer
+CrewMember <|-- MedicalOfficer
+Robot <|-- ExplorationRover
+Robot <|-- Drone
+Robot <|-- RepairRobot
+Robot ..|> Repairable
+
+Location <|.. SurfaceLocation
+Location <|.. Facilities
+Facilities <|-- Laboratory
+Facilities <|-- habitat
+Facilities <|-- powerstation
+Facilities <|-- Storagefacilities
+Facilities <|-- communicationstation
+
+Mission <|-- ExplorationMission
+Mission <|-- ResearchMission
+Mission <|-- RepairMission
+Mission <|-- RescueMission
+
+MarsColony o-- CrewMember
+MarsColony o-- Robot
+MarsColony o-- Facilities
+MarsColony *-- Resources
+MarsColony *-- Environment
+MarsColony *-- Reacordingevents
+MarsColony o-- Mission
+MarsColony ..> OperationResult
+
+AbstractAgent --> Location
+AbstractAgent --> Capability
+CrewMember ..> HealthStatus
+Robot --> DamageStatus
+
+Facilities o-- Equipment
+Facilities o-- Resources
+Equipment --> EquipmentType
+Resources ..> ResourceType
+Environment --> EnvironmentCondition
+
+Mission --> MissionStatus
+Mission o-- AbstractAgent
+Mission ..> Resources
+ExplorationMission --> Equipment
+ResearchMission --> Laboratory
+RepairMission --> Repairable
+RescueMission --> AbstractAgent
+RescueMission --> Facilities
+@enduml

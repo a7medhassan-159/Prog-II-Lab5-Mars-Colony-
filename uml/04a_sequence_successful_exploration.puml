@@ -1,0 +1,29 @@
+@startuml
+title Sequence Diagram - Successful Exploration
+
+actor Main
+participant MarsColony
+participant ExplorationMission
+participant AbstractAgent
+participant Resources
+
+Main -> MarsColony : submitMission(ex1, team)
+MarsColony -> ExplorationMission : validateTeam(team)
+ExplorationMission -> AbstractAgent : canPerform(ex1)
+AbstractAgent --> ExplorationMission : true
+ExplorationMission --> MarsColony : null (team ok)
+MarsColony -> Resources : findShortage(requirement)
+Resources --> MarsColony : null (no shortage)
+MarsColony -> Resources : consume(requirement)
+MarsColony -> ExplorationMission : assign(team, colony)
+ExplorationMission -> AbstractAgent : setBusy(true)
+MarsColony --> Main : success
+
+Main -> MarsColony : advanceTime(5)
+loop 5 times
+  MarsColony -> AbstractAgent : advanceTime()
+  MarsColony -> ExplorationMission : start() / advance()
+end
+MarsColony -> ExplorationMission : release()
+ExplorationMission -> AbstractAgent : setBusy(false)
+@enduml

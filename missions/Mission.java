@@ -94,25 +94,49 @@ public abstract class Mission {
 
     //validation 
 
-    public final String validateTeam(List<AbstractAgent> agents) {
-        if (agents == null || agents.isEmpty()) {
-            return "No agents were provided for the mission";
+    
+public final String validateTeam(List<AbstractAgent> agents) {
+    return validateTeam(agents, true);
+}
+
+private String validateTeam(
+        List<AbstractAgent> agents,
+        boolean checkAvailability) {
+
+    if (agents == null || agents.isEmpty()) {
+        return "No agents were provided for the mission";
+    }
+
+    for (AbstractAgent a : agents) {
+
+        if (a == null) {
+            return "Invalid agent in mission team";
         }
-        for (AbstractAgent a : agents) {
-            if (!a.canPerform(this)) {
-                return "Agent " + a.getName() + " does not have required capability";
-            }
+
+        if (!a.canPerform(this)) {
+            return "Agent " + a.getName()
+                    + " does not have required capability";
         }
+    }
+
+    // Only check availability when assigning a new mission.
+    if (checkAvailability) {
         for (AbstractAgent a : agents) {
             if (!a.isAvailable()) {
-                return "Agent " + a.getName() + " is not available ";
+                return "Agent " + a.getName()
+                        + " is not available";
             }
         }
-        if (!coversRequirements(new ArrayList<AbstractAgent>(agents))) {
-            return "The team does not cover the required capabilities " + getRequiredCapabilities();
-        }
-        return null;
     }
+
+    if (!coversRequirements(new ArrayList<AbstractAgent>(agents))) {
+        return "The team does not cover the required capabilities "
+                + getRequiredCapabilities();
+    }
+
+    return null;
+}
+
 
     private boolean coversRequirements(List<AbstractAgent> agents) {
         Set<Capability> teamCapabilities = new HashSet<>();
@@ -167,26 +191,38 @@ public abstract class Mission {
         return null; 
     }
 
-    public final String checkOngoing(MarsColony colony) {
-        String reason = checkConditions(colony, assignedAgents);
-        if (reason != null) {
-            return reason;
-        }
-        for (Facilities f : getRequiredFacilities()) {
-            if (!f.isOperational()) {
-                return "Required facility " + f.getName() + " is no longer available";
-            }
-        }
-        for (AbstractAgent a : assignedAgents) {
-            String problem = a.getOperationalProblem();
-            if (problem != null) {
-                return "Agent " + a.getName() + " is no longer operational: " + problem;
-            }
-        }
-        return checkOngoingExtras(colony);
+    
+public final String checkOngoing(MarsColony colony) {
+
+    if (requiresCommunication()
+            && !colony.isCommunicationAvailable()) {
+        return "Communication is unavailable";
     }
 
-    //states
+    String teamError = validateTeam(assignedAgents, false);
+
+    if (teamError != null) {
+        return teamError;
+    }
+
+    for (Facilities facility : getRequiredFacilities()) {
+        if (!facility.isOperational()) {
+            return "Required facility "
+                    + facility.getName()
+                    + " is not operational";
+        }
+    }
+
+    for (AbstractAgent agent : assignedAgents) {
+        String problem = agent.getOperationalProblem();
+
+        if (problem != null) {
+            return "Agent " + agent.getName() + ": " + problem;
+        }
+    }
+
+    return checkOngoingExtras(colony);
+}
 
     private void requireStatus(MissionStatus expected, String action) {
         if (status != expected) {

@@ -1,0 +1,19 @@
+@startuml
+title Sequence Diagram - Resource Shortage
+
+actor Main
+participant MarsColony
+participant ExplorationMission
+participant Resources
+participant Storagefacilities
+
+Main -> MarsColony : submitMission(ex3, team)
+MarsColony -> ExplorationMission : validateTeam(team)
+ExplorationMission --> MarsColony : null (team ok)
+MarsColony -> Resources : findShortage(requirement)
+Resources -> Storagefacilities : getResourceQuantity(FUEL)
+Storagefacilities --> Resources : 0
+Resources --> MarsColony : "insufficient FUEL (required 10, available 0)"
+MarsColony -> ExplorationMission : fail(reason)
+MarsColony --> Main : failure(reason)
+@enduml
