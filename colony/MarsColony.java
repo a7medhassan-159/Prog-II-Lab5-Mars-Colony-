@@ -19,8 +19,6 @@ public class MarsColony {
     private final Resources resourceManager = new Resources(facilities);
     private final Environment environment = new Environment();
     private final Reacordingevents Events = new Reacordingevents();
-    private final Map<Integer, List<Runnable>> scheduled = new TreeMap<>();
-
     private Mission activeMission;
     private final List<Mission> missionHistory = new ArrayList<>();
     private Resources periodicConsumption = new Resources();
@@ -139,18 +137,12 @@ public class MarsColony {
     }
 
     
-    public void schedule(int atTime, Runnable action) {
-        if (atTime <= currentTime) throw new IllegalArgumentException("Cannot schedule in the past (now T=" + currentTime + ")");
-        scheduled.computeIfAbsent(atTime, k -> new ArrayList<>()).add(action);
-    }
 
     public void advanceTime() { advanceTime(1); }
 
     public void advanceTime(int units) {
         for (int i = 0; i < units; i++) {
             currentTime++;
-            List<Runnable> actions = scheduled.remove(currentTime);
-            if (actions != null) for (Runnable a : actions) a.run();
             processTimeUnit();
         }
     }
