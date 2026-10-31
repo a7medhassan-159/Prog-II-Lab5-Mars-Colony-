@@ -46,7 +46,6 @@ public class EmergencyManager {
                 return robot;
             }
         }
-
         return null;
     }
 
@@ -124,8 +123,8 @@ public class EmergencyManager {
         }
 
         
-        var engineerOriginalLocation = engineer.getLocation();
-        var robotOriginalLocation = robot.getLocation();
+        Location engineerOriginalLocation = engineer.getLocation();
+        Location robotOriginalLocation = robot.getLocation();
 
        
         engineer.setLocation(affectedHabitat);

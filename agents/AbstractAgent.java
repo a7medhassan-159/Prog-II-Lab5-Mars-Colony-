@@ -1,5 +1,6 @@
 package agents;
 import  colony.*;
+import emergencies.Emergency;
 import missions.Mission;
 
 import java.util.*;
@@ -29,12 +30,13 @@ public abstract class AbstractAgent {
 
     public boolean canHandleEmergency(Capability capability) {
     return isAvailable() && hasCapability(capability);
-}
+    }
 
 
     public Location getLocation() {
         return location;
     }
+
 
     
     public void setLocation(Location location) {
@@ -48,7 +50,17 @@ public abstract class AbstractAgent {
         return isOperational() && !isBusy();
     }
     
-
+    public boolean canHandle(Emergency emergency) {
+        if (!isOperational()) {
+            return false;
+        }
+        for (Capability c : emergency.getRequiredResponders()) {
+            if (hasCapability(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     public Set<Capability> getCapabilities() {return capabilities;}
 
