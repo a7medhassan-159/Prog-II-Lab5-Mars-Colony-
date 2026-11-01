@@ -1,12 +1,24 @@
-@startuml
-title MARS-OPS Class Diagram
+@startuml 01_class_diagram
+title MARS-OPS - Class Diagram
+
+' ---- Plain & Wide Spacing Settings ----
+skinparam monochrome true
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+' زيادة التباعد الأفقي والرأسي بشكل كبير
+skinparam nodesep 150
+skinparam ranksep 150
+skinparam packagePadding 40
 
 package agents {
   interface Repairable {
-    getName()
-    isDamaged()
-    repair()
+    + isDamaged() : boolean
+    + repair()
   }
+
   enum Capability {
     SCIENTIFIC_RESEARCH
     ENGINEERING_REPAIR
@@ -16,67 +28,108 @@ package agents {
     SURFACE_TRAVEL
     AERIAL_RECON
   }
+
   enum HealthStatus {
     HEALTHY
     INJURED
     CRITICAL
   }
+
   enum DamageStatus {
     OPERATIONAL
     DAMAGED
   }
+
   abstract class AbstractAgent {
     - id : String
     - name : String
     - busy : boolean
+    - location : Location
+    - capabilities : Set<Capability>
+    + canPerform(mission : Mission) : boolean
+    + canHandle(emergency : Emergency) : boolean
     + isAvailable() : boolean
-    + canPerform(mission) : boolean
-    + advanceTime()
+    + getOperationalProblem() : String
+    + {abstract} advanceTime()
   }
+
   abstract class CrewMember {
     - health : int
     - fatigue : int
     + performDuty()
-    + heal(amount)
+    + heal(amount : int)
+    + reduceHealth(amount : int)
+    + receiveTreatment(amount : int)
+    + getHealthStatus() : HealthStatus
   }
+
   abstract class Robot {
     - battery : int
-    + drainBattery(amount)
-    + recharge(amount)
+    - damageStatus : DamageStatus
+    + drainBattery(amount : int)
+    + recharge(amount : int)
+    + markDamaged()
     + repair()
+    + {abstract} getBatteryDrainPerUnit() : int
+    + {abstract} getBatteryrechargePerUnit() : int
   }
-  class Scientist
-  class Engineer
-  class MedicalOfficer
-  class ExplorationRover
-  class Drone
+
+  class Scientist {
+    + performDuty()
+  }
+
+  class Engineer {
+    + performDuty()
+  }
+
+  class MedicalOfficer {
+    + performDuty()
+  }
+
+  class ExplorationRover {
+    + getEnvironmentRestriction(env : Environment) : String
+  }
+
+  class Drone {
+    + getEnvironmentRestriction(env : Environment) : String
+  }
+
   class RepairRobot
 }
 
 package colony {
   interface Location {
-    getName()
-    isOperational()
-    isSheltered()
+    + getName() : String
+    + isOperational() : boolean
+    + isSheltered() : boolean
   }
+
   class SurfaceLocation
+
   class OperationResult {
     - success : boolean
     - message : String
+    + {static} success(msg : String) : OperationResult
+    + {static} failure(reason : String) : OperationResult
   }
+
   class Reacordingevents {
-    - entries : List
-    + record(time, message)
+    - entries : List<String>
+    + record(time : int, message : String)
   }
+
   class MarsColony {
     - name : String
     - currentTime : int
-    + addCrewMember(member)
-    + addRobot(robot)
-    + addFacility(facility)
-    + submitMission(mission, agents)
-    + advanceTime(units)
-    + activateCondition(condition)
+    - activeMission : Mission
+    - missionHistory : List<Mission>
+    + addCrewMember(member : CrewMember)
+    + addRobot(robot : Robot)
+    + addFacility(facility : Facilities)
+    + submitMission(m : Mission, agents : List<AbstractAgent>) : OperationResult
+    + advanceTime(units : int)
+    + activateCondition(c : EnvironmentCondition)
+    + reevaluateActiveMission()
   }
 }
 
@@ -86,30 +139,35 @@ package environment {
     DUST_STORM
     COMMUNICATION_DISRUPTION
   }
+
   class Environment {
-    + activate(condition)
-    + deactivate(condition)
+    - active : Set<EnvironmentCondition>
+    + activate(c : EnvironmentCondition)
+    + deactivate(c : EnvironmentCondition)
     + isDustStorm() : boolean
+    + isCommunicationDisrupted() : boolean
   }
 }
 
-package "Facilities" as pkgFacilities {
-  enum EquipmentType {
-    SCIENTIFIC
-    EXPLORATION
-    REPAIR_TOOLS
-    MEDICAL
-    COMMUNICATION
-  }
+package "Facilities" as Facilities_pkg {
   abstract class Facilities {
     - name : String
     - capacity : int
     - isOperational : boolean
-    + addresource(type, quantity)
-    + addEquipment(equipment)
+    - isSheltered : boolean
+    + addresource(type : ResourceType, qty : int)
+    + consumeresource(type : ResourceType, qty : int) : boolean
+    + addEquipment(e : Equipment)
+    + findAvailableEquipment(t : EquipmentType) : Equipment
   }
+
   class Laboratory
-  class habitat
+  class habitat {
+    - oxygenLeakActive : boolean
+    + startOxygenLeak()
+    + repairOxygenLeak()
+    + removeOxygen(amount : int) : boolean
+  }
   class powerstation
   class Storagefacilities
   class communicationstation
@@ -125,17 +183,33 @@ package resources {
     MEDICAL_SUPPLIES
     SPARE_PARTS
   }
-  class Resources {
-    + getQuantity(type)
-    + addQuantity(type, amount)
-    + findShortage(requirement)
-    + consume(requirement)
+
+  enum EquipmentType {
+    SCIENTIFIC
+    EXPLORATION
+    REPAIR_TOOLS
+    MEDICAL
+    COMMUNICATION
   }
+
+  class Resources {
+    - amounts : Map<ResourceType, Integer>
+    + getQuantity(t : ResourceType) : int
+    + addQuantity(t : ResourceType, n : int)
+    + findShortage(req : Resources) : String
+    + canSupply(req : Resources) : boolean
+    + consume(req : Resources) : boolean
+  }
+
   class Equipment {
     - id : String
     - name : String
+    - type : EquipmentType
     - damaged : boolean
     - inUse : boolean
+    + damage()
+    + repair()
+    + isAvailableForUse() : boolean
   }
 }
 
@@ -147,31 +221,94 @@ package missions {
     COMPLETED
     FAILED
   }
+
   abstract class Mission {
     - id : String
     - name : String
     - duration : int
     - timepassed : int
-    + validateTeam(agents)
-    + assign(agents, colony)
-    + start(colony)
-    + advance(colony)
-    + fail(reason)
+    - status : MissionStatus
+    - failureReason : String
+    - assignedAgents : List<AbstractAgent>
+    + validateTeam(agents : List<AbstractAgent>) : String
+    + assign(agents : List<AbstractAgent>, colony : MarsColony)
+    + start(colony : MarsColony)
+    + advance(colony : MarsColony)
+    + fail(reason : String)
     + release()
+    + {abstract} getRequiredCapabilities() : List<Capability>
+    + {abstract} getResourceRequirement() : Resources
   }
+
   class ExplorationMission {
     - region : String
+    - equipment : Equipment
   }
-  class ResearchMission
-  class RepairMission
-  class RescueMission
+
+  class ResearchMission {
+    - laboratory : Laboratory
+    - equipment : Equipment
+  }
+
+  class RepairMission {
+    - target : Repairable
+  }
+
+  class RescueMission {
+    - stranded : AbstractAgent
+    - destination : Facilities
+  }
 }
 
+package emergencies {
+  enum EmergencyStatus {
+    PENDING
+    ACTIVE
+    RESOLVED
+    UNRESOLVED
+  }
+
+  abstract class Emergency {
+    - id : String
+    - description : String
+    - status : EmergencyStatus
+    - unresolvedReason : String
+    - responders : List<AbstractAgent>
+    + {final} handle(colony : MarsColony) : OperationResult
+    + {abstract} getRequiredResponders() : List<Capability>
+    # {abstract} getResponseResources() : Resources
+    # {abstract} onDetected(colony : MarsColony)
+    # {abstract} onResolved(colony : MarsColony)
+    # {abstract} onUnresolved(colony : MarsColony)
+  }
+
+  class OxygenLeak {
+    - oxygenLoss : int
+    - totalOxygenLost : int
+  }
+
+  class Fire
+  class MedicalEmergency {
+    - healthLoss : int
+  }
+
+  class RoverBreakdown
+
+  class EmergencyManager {
+    - status : Status
+    - lastReason : String
+    + handleOxygenLeak(id : String, h : habitat, loss : int, parts : int, ok : boolean) : Status
+  }
+}
+
+' ---- Inheritance / Realization ----
 AbstractAgent <|-- CrewMember
 AbstractAgent <|-- Robot
+
 CrewMember <|-- Scientist
 CrewMember <|-- Engineer
 CrewMember <|-- MedicalOfficer
+
 Robot <|-- ExplorationRover
 Robot <|-- Drone
 Robot <|-- RepairRobot
@@ -179,6 +316,7 @@ Robot ..|> Repairable
 
 Location <|.. SurfaceLocation
 Location <|.. Facilities
+
 Facilities <|-- Laboratory
 Facilities <|-- habitat
 Facilities <|-- powerstation
@@ -190,32 +328,52 @@ Mission <|-- ResearchMission
 Mission <|-- RepairMission
 Mission <|-- RescueMission
 
-MarsColony o-- CrewMember
-MarsColony o-- Robot
-MarsColony o-- Facilities
-MarsColony *-- Resources
-MarsColony *-- Environment
-MarsColony *-- Reacordingevents
-MarsColony o-- Mission
-MarsColony ..> OperationResult
+Emergency <|-- OxygenLeak
+Emergency <|-- Fire
+Emergency <|-- MedicalEmergency
+Emergency <|-- RoverBreakdown
 
-AbstractAgent --> Location
-AbstractAgent --> Capability
+' ---- Composition / Aggregation ----
+MarsColony "1" *-- "1" Environment
+MarsColony "1" *-- "1" Reacordingevents
+MarsColony "1" *-- "1" Resources
+MarsColony "1" o-- "0..*" CrewMember
+MarsColony "1" o-- "0..*" Robot
+MarsColony "1" o-- "0..*" Facilities
+MarsColony "1" o-- "0..*" Mission
+
+Facilities "1" *-- "0..*" Equipment
+Resources "1" o-- "0..*" Facilities
+
+Mission "1" o-- "1..*" AbstractAgent : assignedAgents
+Emergency "1" o-- "0..*" AbstractAgent : responders
+
+' ---- Associations ----
+AbstractAgent "*" -down-> "1" Location : location
+AbstractAgent -right-> "1..*" Capability
 CrewMember ..> HealthStatus
-Robot --> DamageStatus
+Robot -down-> DamageStatus
+Equipment -right-> EquipmentType
+Environment -right-> EnvironmentCondition
+Mission -right-> MissionStatus
+Emergency -right-> EmergencyStatus
 
-Facilities o-- Equipment
-Facilities o-- Resources
-Equipment --> EquipmentType
-Resources ..> ResourceType
-Environment --> EnvironmentCondition
-
-Mission --> MissionStatus
-Mission o-- AbstractAgent
-Mission ..> Resources
 ExplorationMission --> Equipment
 ResearchMission --> Laboratory
+ResearchMission --> Equipment
 RepairMission --> Repairable
-RescueMission --> AbstractAgent
-RescueMission --> Facilities
+RescueMission --> AbstractAgent : stranded
+RescueMission --> Facilities : destination
+
+OxygenLeak --> habitat
+Fire --> Laboratory
+MedicalEmergency --> CrewMember : patient
+RoverBreakdown --> ExplorationRover
+
+' ---- Dependencies ----
+MarsColony ..> OperationResult
+Mission ..> Resources
+Resources ..> ResourceType
+Emergency ..> MarsColony
+
 @enduml

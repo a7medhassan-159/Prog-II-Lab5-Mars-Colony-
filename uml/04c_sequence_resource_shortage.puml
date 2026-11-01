@@ -1,19 +1,29 @@
-@startuml
-title Sequence Diagram - Resource Shortage
+@startuml 04c_sequence_resource_shortage
+title Sequence Diagram 3 - Resource Shortage (Scenario 3)
+skinparam shadowing false
+autonumber
 
 actor Main
-participant MarsColony
-participant ExplorationMission
-participant Resources
-participant Storagefacilities
+participant "MarsColony" as C
+participant "ex3 : ExplorationMission" as M
+participant "Resources" as R
+participant "Storagefacilities" as S
 
-Main -> MarsColony : submitMission(ex3, team)
-MarsColony -> ExplorationMission : validateTeam(team)
-ExplorationMission --> MarsColony : null (team ok)
-MarsColony -> Resources : findShortage(requirement)
-Resources -> Storagefacilities : getResourceQuantity(FUEL)
-Storagefacilities --> Resources : 0
-Resources --> MarsColony : "insufficient FUEL (required 10, available 0)"
-MarsColony -> ExplorationMission : fail(reason)
-MarsColony --> Main : failure(reason)
+Main -> C : submitMission(ex3, team)
+activate C
+C -> C : validateSubmission()
+C -> M : validateTeam(team)
+M --> C : null (team ok)
+C -> M : checkConditions(colony, team)
+M --> C : null
+C -> R : findShortage(requirement)
+activate R
+R -> S : getResourceQuantity(FUEL)
+S --> R : 0
+R --> C : "insufficient FUEL (required 10, available 0)"
+deactivate R
+C -> M : fail("Insufficient resources: ...")
+note right of M : status = FAILED\nall-or-nothing: nothing consumed
+C --> Main : OperationResult.failure(reason)
+deactivate C
 @enduml

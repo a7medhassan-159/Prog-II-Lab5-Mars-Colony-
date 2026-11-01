@@ -1,0 +1,34 @@
+// State machine for emergencies.Emergency (EmergencyStatus enum)
+// Derived from Emergency.handle() / markUnresolved()
+%class Emergency
+%package emergencies
+%start EmergencyMap::PENDING
+
+%map EmergencyMap
+%%
+
+PENDING
+{
+    // Emergency.handle()
+    handle              ACTIVE          { onDetected(); reevaluateActiveMission(); }
+}
+
+ACTIVE
+{
+    // preconditions OK, responders found, resources available
+    resolve             RESOLVED        { dispatchResponders(); consumeResources(); onResolved(); releaseResponders(); }
+
+    // precondition failed, no responder, or insufficient resources
+    cannotRespond(reason: String)
+                        UNRESOLVED      { setUnresolvedReason(reason); onUnresolved(); }
+}
+
+RESOLVED
+{
+}
+
+UNRESOLVED
+{
+}
+
+%%

@@ -4,7 +4,6 @@ import agents.*;
 import Facilities.*;
 import resources.*;
 import java.util.*;
-import environment.*;
 import emergencies.*;
 
 public class Main {
@@ -138,7 +137,7 @@ public class Main {
         header("SCENARIO 4: Emergency Handling (Oxygen Leak)");
 
         World w4 = buildWorld(20, 100);
-        EmergencyManager emergencyManager = new EmergencyManager(w4.colony);
+        OxygenLeak leak = new OxygenLeak("EM-004", w4.habitat, 20);
 
         System.out.println("  Emergency: Oxygen Leak");
         System.out.println("  Affected facility: " + w4.habitat.getName());
@@ -148,53 +147,21 @@ public class Main {
         System.out.println("  Engineer available: " + w4.engineer.isAvailable());
         System.out.println("  Repair robot available: " + w4.repairRobot.isAvailable());
 
-        EmergencyManager.Status emergencyResult =
-                emergencyManager.handleOxygenLeak("EM-004", w4.habitat, 20, 2, true);
+        OperationResult emergencyResult = leak.handle(w4.colony);
 
-        System.out.println("\n  Emergency result: " + emergencyResult);
+        System.out.println("\n  Emergency result: " + leak.getStatus());
+        System.out.println("  Message: " + emergencyResult.getMessage());
+        System.out.println("  Total oxygen lost: " + leak.getTotalOxygenLost());
         System.out.println("  Oxygen after emergency: " + w4.habitat.getResourceQuantity(ResourceType.OXYGEN));
         System.out.println("  Spare parts after repair: "
                 + w4.colony.getResourceManager().getTotal(ResourceType.SPARE_PARTS));
         System.out.println("  Habitat leak active (after response): " + w4.habitat.hasOxygenLeak());
 
-        // Print the failure reason only if the response actually failed.
-        String reason = emergencyManager.getLastReason();
-        if (reason != null && !reason.isEmpty()) {
-            System.out.println("  Failure reason: " + reason);
+        if (leak.getStatus() == EmergencyStatus.UNRESOLVED) {
+            System.out.println("  Failure reason: " + leak.getUnresolvedReason());
         }
 
         System.out.println("  Engineer busy after response: " + w4.engineer.isBusy());
         System.out.println("  Repair robot busy after response: " + w4.repairRobot.isBusy());
-
-        // ===================== SCENARIO 5 =====================
-        header("SCENARIO 5: Environmental Effect (Dust Storm)");
-
-        World w5 = buildWorld(20, 100);
-        List<AbstractAgent> team5 = List.of(w5.scientist, w5.rover);
-        ExplorationMission ex5 = new ExplorationMission("EX-5", "Olympus Mons", "Scientist", 5);
-
-        w5.colony.activateCondition(EnvironmentCondition.DUST_STORM);
-        System.out.println("  Environment: " + w5.colony.getEnvironment());
-
-        OperationResult r5 = w5.colony.submitMission(ex5, team5);
-
-        System.out.println("  Exploration Mission started: " + r5.isSuccess());
-        if (!r5.isSuccess()) {
-            System.out.println("  Exploration Mission cannot start.");
-            System.out.println("  Reason: " + r5.getMessage());
-        }
-        System.out.println("  Mission status: " + ex5.getStatus());
-        System.out.println("  Never became active: " + (w5.colony.getActiveMission() != ex5));
-
-
-        ExplorationMission ex5b = new ExplorationMission("EX-5B", "Olympus Mons", "Scientist", 5);
-        OperationResult r5b = w5.colony.submitMission(ex5b, team5);
-        System.out.println("  Retry success : " + r5b.isSuccess());
-        System.out.println("  Retry status  : " + ex5b.getStatus());
-
-        // ===================== FINISH =====================
-        System.out.println("\n==================================================");
-        System.out.println("             ALL 5 SCENARIOS EXECUTED");
-        System.out.println("==================================================");
     }
 }

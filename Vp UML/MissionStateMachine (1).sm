@@ -1,0 +1,52 @@
+// State machine for missions.Mission (MissionStatus enum)
+// Derived from Mission.java and MarsColony.java
+%class Mission
+%package missions
+%start MissionMap::CREATED
+
+%map MissionMap
+%%
+
+CREATED
+{
+    // MarsColony.submitMission(): validation passed, resources consumed
+    assign              ASSIGNED        { onAssigned(); }
+
+    // MarsColony.submitMission(): rejected
+    fail(reason: String)
+                        FAILED          { setFailureReason(reason); }
+}
+
+ASSIGNED
+{
+    // next time unit, checkOngoing() == null
+    start               IN_PROGRESS     { onStarted(); }
+
+    // checkOngoing() reports a problem
+    fail(reason: String)
+                        FAILED          { setFailureReason(reason); release(); }
+}
+
+IN_PROGRESS
+{
+    // advance(): timepassed + 1 >= duration
+    advance [ctxt.isLastStep()]
+                        COMPLETED       { incrementTime(); onCompleted(); release(); }
+
+    // advance(): time left -> stay in IN_PROGRESS
+    advance             nil             { incrementTime(); }
+
+    // checkOngoing() reports a problem
+    fail(reason: String)
+                        FAILED          { setFailureReason(reason); release(); }
+}
+
+COMPLETED
+{
+}
+
+FAILED
+{
+}
+
+%%

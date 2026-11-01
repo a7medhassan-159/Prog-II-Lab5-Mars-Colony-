@@ -1,29 +1,52 @@
-@startuml
-title Sequence Diagram - Successful Exploration
+@startuml 04a_sequence_successful_exploration
+title Sequence Diagram 1 - Successful Exploration (Scenario 1)
+skinparam shadowing false
+autonumber
 
 actor Main
-participant MarsColony
-participant ExplorationMission
-participant AbstractAgent
-participant Resources
+participant "MarsColony" as C
+participant "ex1 : ExplorationMission" as M
+participant "team : AbstractAgent" as A
+participant "Resources" as R
+participant "Storagefacilities" as S
 
-Main -> MarsColony : submitMission(ex1, team)
-MarsColony -> ExplorationMission : validateTeam(team)
-ExplorationMission -> AbstractAgent : canPerform(ex1)
-AbstractAgent --> ExplorationMission : true
-ExplorationMission --> MarsColony : null (team ok)
-MarsColony -> Resources : findShortage(requirement)
-Resources --> MarsColony : null (no shortage)
-MarsColony -> Resources : consume(requirement)
-MarsColony -> ExplorationMission : assign(team, colony)
-ExplorationMission -> AbstractAgent : setBusy(true)
-MarsColony --> Main : success
+Main -> C : submitMission(ex1, team)
+activate C
+C -> C : validateSubmission()
+C -> M : validateTeam(team)
+activate M
+M -> A : canPerform(ex1)
+A --> M : true
+M --> C : null (team ok)
+deactivate M
+C -> M : checkConditions(colony, team)
+M --> C : null
+C -> R : findShortage(requirement)
+R --> C : null (no shortage)
+C -> R : consume(requirement)
+R -> S : consumeresource(FUEL, 10)
+S --> R : true
+R --> C : true
+C -> M : assign(team, colony)
+M -> A : setBusy(true)
+note right of M : status = ASSIGNED
+C --> Main : OperationResult.success
+deactivate C
 
-Main -> MarsColony : advanceTime(5)
-loop 5 times
-  MarsColony -> AbstractAgent : advanceTime()
-  MarsColony -> ExplorationMission : start() / advance()
+Main -> C : advanceTime(5)
+activate C
+loop 5 time units
+  C -> A : advanceTime()
+  C -> M : checkOngoing(colony)
+  M --> C : null
+  opt first unit
+    C -> M : start(colony)
+    note right of M : status = IN_PROGRESS
+  end
+  C -> M : advance(colony)
 end
-MarsColony -> ExplorationMission : release()
-ExplorationMission -> AbstractAgent : setBusy(false)
+note right of M : timepassed = duration\nstatus = COMPLETED
+C -> M : release()
+M -> A : setBusy(false)
+deactivate C
 @enduml

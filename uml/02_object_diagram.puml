@@ -1,67 +1,102 @@
-@startuml
-title Object Diagram - Exploration mission assigned
+@startuml 02_object_diagram
+title MARS-OPS - Object Diagram (Scenario 1 after submitMission)
+skinparam shadowing false
 
-object ares {
+object "ares : MarsColony" as ares {
   name = "Ares Base"
   currentTime = 0
 }
-object env {
-  active = none
+object "env : Environment" as env {
+  active = {}
 }
-object lab {
+object "log : Reacordingevents" as log {
+  entries = ["Mission submitted: EX-1", ...]
+}
+object "res : Resources" as res {
+  WATER = 50
+  BATTERY_POWER = 50
+  FUEL = 10
+  SPARE_PARTS = 10
+  OXYGEN = 100
+}
+object "lab : Laboratory" as lab {
   name = "Central Lab"
   capacity = 10
+  isOperational = true
 }
-object power {
+object "power : powerstation" as power {
   name = "Solar Power Station"
-  BATTERY_POWER = 50
+  capacity = 20
 }
-object storage {
+object "storage : Storagefacilities" as storage {
   name = "Main Storage"
-  FUEL = 10
+  capacity = 50
 }
-object roverKit {
+object "hab : habitat" as hab {
+  name = "Main Habitat"
+  oxygenLeakActive = false
+}
+object "eq1 : Equipment" as eq1 {
+  id = "EQ-01"
+  type = SCIENTIFIC
+  inUse = false
+}
+object "eq2 : Equipment" as eq2 {
   id = "EQ-02"
   type = EXPLORATION
   inUse = true
 }
-object scientist {
+object "dr_sarah : Scientist" as sarah {
   id = "C-01"
   name = "Dr. Sarah"
   health = 100
   busy = true
 }
-object engineer {
+object "eng_alex : Engineer" as alex {
   id = "C-02"
   name = "Eng. Alex"
+  health = 100
   busy = false
 }
-object rover {
+object "rover_alpha : ExplorationRover" as rover {
   id = "R-01"
   name = "Rover Alpha"
   battery = 100
   busy = true
 }
-object ex1 {
+object "repair_bot : RepairRobot" as bot {
+  id = "R-02"
+  name = "Repair Robot"
+  battery = 100
+  busy = false
+}
+object "ex1 : ExplorationMission" as ex1 {
   id = "EX-1"
   region = "Olympus Mons"
   duration = 5
+  timepassed = 0
   status = ASSIGNED
 }
 
-ares --> env
-ares --> lab
-ares --> power
-ares --> storage
-ares --> scientist
-ares --> engineer
-ares --> rover
-ares --> ex1
-lab --> roverKit
-scientist --> lab : location
-engineer --> lab : location
-rover --> lab : location
-ex1 --> scientist : agent
-ex1 --> rover : agent
-ex1 --> roverKit : equipment
+ares *-- env
+ares *-- log
+ares *-- res
+ares o-- lab
+ares o-- power
+ares o-- storage
+ares o-- hab
+ares o-- sarah
+ares o-- alex
+ares o-- rover
+ares o-- bot
+ares --> ex1 : activeMission
+lab *-- eq1
+lab *-- eq2
+ex1 --> sarah : assignedAgents
+ex1 --> rover : assignedAgents
+ex1 --> eq2 : equipment
+sarah ..> lab : location
+alex ..> lab : location
+rover ..> lab : location
+bot ..> lab : location
 @enduml

@@ -1,16 +1,25 @@
-@startuml
-title Sequence Diagram - Mission Rejection (Unsuitable Agent)
+@startuml 04b_sequence_mission_rejection
+title Sequence Diagram 2 - Mission Rejection, Unsuitable Agent (Scenario 2)
+skinparam shadowing false
+autonumber
 
 actor Main
-participant MarsColony
-participant ResearchMission
-participant Engineer
+participant "MarsColony" as C
+participant "bad : ResearchMission" as M
+participant "engineer : Engineer" as E
 
-Main -> MarsColony : submitMission(bad, [engineer])
-MarsColony -> ResearchMission : validateTeam([engineer])
-ResearchMission -> Engineer : canPerform(bad)
-Engineer --> ResearchMission : false
-ResearchMission --> MarsColony : "does not have required capability"
-MarsColony -> ResearchMission : fail(reason)
-MarsColony --> Main : failure(reason)
+Main -> C : submitMission(bad, [engineer])
+activate C
+C -> C : validateSubmission()
+C -> M : validateTeam([engineer])
+activate M
+M -> E : canPerform(bad)
+E --> M : false
+M --> C : reason (team lacks required capability)
+deactivate M
+C -> M : fail(reason)
+note right of M : status = FAILED\nnever becomes active\nno resources consumed
+C -> C : missionHistory.add(bad)
+C --> Main : OperationResult.failure(reason)
+deactivate C
 @enduml

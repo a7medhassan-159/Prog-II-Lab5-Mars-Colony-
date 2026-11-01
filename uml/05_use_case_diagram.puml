@@ -1,28 +1,44 @@
-@startuml
-title Use Case Diagram - MARS-OPS
-
+@startuml 05_use_case_diagram
+title MARS-OPS - Use Case Diagram
 left to right direction
-actor Operator
-actor Environment
+skinparam shadowing false
+
+actor "Colony Operator" as Op
+actor "Mars Environment" as Env
+actor "Responders\n(crew & robots)" as Resp
 
 rectangle "MARS-OPS" {
   usecase "Set up colony" as Setup
   usecase "Submit mission" as Submit
-  usecase "Check team capabilities" as Team
+  usecase "Validate team capabilities" as Team
   usecase "Check resources" as Res
-  usecase "Reject mission" as Reject
+  usecase "Check environment" as EnvChk
+  usecase "Reject mission with reason" as Reject
   usecase "Advance time" as Time
-  usecase "Change environment condition" as Env
-  usecase "View status report" as Report
+  usecase "Run and complete mission" as Run
+  usecase "View event log / status" as Report
+  usecase "Activate environment condition" as Cond
+  usecase "Fail active mission" as FailM
+  usecase "Handle emergency (oxygen leak)" as Emg
+  usecase "Assign responders" as Assign
+  usecase "Consume spare parts and repair" as Parts
 }
 
-Operator --> Setup
-Operator --> Submit
-Operator --> Time
-Operator --> Report
-Environment --> Env
+Op --> Setup
+Op --> Submit
+Op --> Time
+Op --> Report
+Op --> Emg
+Env --> Cond
+Resp --> Assign
 
 Submit ..> Team : <<include>>
 Submit ..> Res : <<include>>
+Submit ..> EnvChk : <<include>>
 Reject ..> Submit : <<extend>>
+Time ..> Run : <<include>>
+FailM ..> Time : <<extend>>
+Cond ..> FailM : <<extend>>
+Emg ..> Assign : <<include>>
+Emg ..> Parts : <<include>>
 @enduml

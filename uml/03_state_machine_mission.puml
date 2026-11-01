@@ -1,14 +1,19 @@
-@startuml
-title State Machine Diagram - Mission
+@startuml 03_state_machine_mission
+title MARS-OPS - State Machine Diagram (Mission lifecycle)
+skinparam shadowing false
 
-[*] --> CREATED
-CREATED --> ASSIGNED : submitMission() succeeds
-CREATED --> FAILED : submitMission() rejected
-ASSIGNED --> IN_PROGRESS : start()
-ASSIGNED --> FAILED : problem found
-IN_PROGRESS --> IN_PROGRESS : advance() [time left]
+[*] --> CREATED : new Mission()
+
+CREATED --> ASSIGNED : submitMission() / validation and\nresource check pass -> assign()
+CREATED --> FAILED : submitMission() / validation or\nresource check fails -> fail(reason)
+
+ASSIGNED --> IN_PROGRESS : processTimeUnit() / start()
+ASSIGNED --> FAILED : checkOngoing() problem\n(e.g. dust storm) -> fail(reason)
+
+IN_PROGRESS --> IN_PROGRESS : advance() [timepassed < duration]
 IN_PROGRESS --> COMPLETED : advance() [timepassed >= duration]
-IN_PROGRESS --> FAILED : problem found
-COMPLETED --> [*]
-FAILED --> [*]
+IN_PROGRESS --> FAILED : checkOngoing() problem -> fail(reason)
+
+COMPLETED --> [*] : release() agents
+FAILED --> [*] : release() agents
 @enduml
